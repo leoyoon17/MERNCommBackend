@@ -1,0 +1,13 @@
+//- TODO
+
+extends layout
+
+block content
+  h1= title
+
+  each brand in brand_list
+    li
+      a(href=brand.url)  #{brand.name}
+
+  else
+    li There are no brands.

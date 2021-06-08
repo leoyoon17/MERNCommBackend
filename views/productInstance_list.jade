@@ -1,0 +1,18 @@
+//- TODO
+
+extends layout
+
+block content
+  h1= title
+
+  ul
+    each productInstance in productInstance_list
+      li
+        a(href=productInstance.url) #{productInstance.product.title} 
+        if productInstance.product.status=='Available'
+          span.text-success #{productInstance.status}
+        else if productInstance.status=='Out of Stock'
+          p this product is 
+          | span.text-danger #{productInstance.status}
+    else
+      li There are no products.

@@ -1,0 +1,18 @@
+extend layout
+
+block content
+
+  h1 Brand: #{brand.name}
+
+  div(style='margin-left:20px;margin-top:20px')
+
+    h4 Products
+
+    d1
+      each product in brand_products
+        dt
+          a(href=product.url) #{product.name}
+        dd #{product.description}
+
+      else
+        p This Brand has no Products.

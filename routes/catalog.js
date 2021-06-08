@@ -3,7 +3,7 @@ var router = express.Router();
 
 // Require controller modules
 var product_controller = require('../controllers/productController');
-var product_instance_controller = require('../controllers/productInstanceController');
+var productInstance_controller = require('../controllers/productInstanceController');
 var brand_controller = require('../controllers/brandController');
 var tag_controller = require('../controllers/tagController');
 
@@ -97,28 +97,28 @@ router.get('/tags', tag_controller.tag_list);
 
 // GET request for creating a ProductInstance
 // Note:  this must come before route that displays ProductInstance
-router.get('/productInstance/create', product_instance_controller.productInstance_create_get);
+router.get('/productInstance/create', productInstance_controller.productInstance_create_get);
 
 // POST request for creating a ProductInstance
-router.post('/productInstance/create', product_instance_controller.productInstance_create_post);
+router.post('/productInstance/create', productInstance_controller.productInstance_create_post);
 
 // GET request for deleting a ProductInstance
-router.get('/productInstance/:id/delete', product_instance_controller.productInstance_delete_get);
+router.get('/productInstance/:id/delete', productInstance_controller.productInstance_delete_get);
 
 // POST request for deleting a ProductInstance
-router.post('/productInstance/:id/delete', product_instance_controller.productInstance_delete_post);
+router.post('/productInstance/:id/delete', productInstance_controller.productInstance_delete_post);
 
 // GET request for updating a ProductInstance
-router.get('/productInstance/:id/update', product_instance_controller.productInstance_update_get);
+router.get('/productInstance/:id/update', productInstance_controller.productInstance_update_get);
 
 // POST request for updating a ProductInstance
-router.post('/productInstnace/:id/update', product_instance_controller.productInstance_update_post);
+router.post('/productInstnace/:id/update', productInstance_controller.productInstance_update_post);
 
 // GET request for ONE ProductInstance
-router.get('/productInstance/:id', product_instance_controller.productInstance_detail);
+router.get('/productInstance/:id', productInstance_controller.productInstance_detail);
 
 // POST request for list of all ProductInstances
-router.get('/productInstances', product_instance_controller.productInstance_list);
+router.get('/productInstances', productInstance_controller.productInstance_list);
 
 
 module.exports = router;

@@ -1,0 +1,11 @@
+extend layout 
+
+block content
+
+  h1 #{productInstance.product.name}
+
+  p #[strong Status:]
+    if productInstance.product.status=='Available'
+      span.text-success #{productInstance.product.status}
+    else if productInstance.product.status=='Out of Stock'
+      span.text-danger #{productInstance.product.status}

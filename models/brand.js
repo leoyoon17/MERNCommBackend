@@ -1,5 +1,8 @@
 const mongoose = require('mongoose');
 
+const Product = require('./product');
+const ProductInstance = require('./productInstance');
+
 const BrandSchema = new mongoose.Schema({
   name: {
           type: String,
@@ -15,6 +18,8 @@ BrandSchema
   .get(function () {
     return '/catalog/brand/' + this._id;
   });
+  
+
 
 const Brand = mongoose.model("Brand", BrandSchema);
 

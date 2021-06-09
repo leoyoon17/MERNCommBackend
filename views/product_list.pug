@@ -10,7 +10,7 @@ block content
     each product in product_list
       li
         a(href=product.url) #{product.name}
-        | (#{product.brand.name})
+        | (#{(product.brand==null) ? '' : product.brand.name})
 
     else
       li There are no products.

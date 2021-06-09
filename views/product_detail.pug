@@ -4,7 +4,8 @@ block content
   h1 Product: #{product.name}
 
   p #[strong Brand:]
-    a(href=product.brand.url) #{product.brand.name}
+    if product.brand != null
+      a(href=product.brand.url) #{product.brand.name}
   p #[strong Description:] #{product.description}
   p #[strong Stock:] #{product_count}
   p #[strong Status:] #{product.status}

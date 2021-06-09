@@ -49,8 +49,14 @@ router.post('/brand/create', brand_controller.brand_create_post);
 // GET request to delete Brand
 router.get('/brand/:id/delete', brand_controller.brand_delete_get);
 
+// GET request to CASCADE delete Brand
+router.get('/brand/:id/cascadeDelete', brand_controller.brand_cascade_delete_get);
+
 // POST request to delete Brand
 router.post('/brand/:id/delete', brand_controller.brand_delete_post);
+
+// POST request to CASCADE delete Brand
+router.post('/brand/:id/cascadeDelete', brand_controller.brand_cascade_delete_post);
 
 // GET request to update Brand
 router.get('/brand/:id/update', brand_controller.brand_update_get);

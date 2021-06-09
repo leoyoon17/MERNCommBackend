@@ -1,0 +1,26 @@
+extend layout
+
+block content
+  h1 #{title}: #{brand.name}
+
+  if brand_products.length
+
+    p #[strong The following Products and their instances will be deleted with this Brand.]
+
+    div(style='margin-left:20px; margin-top:20px')
+
+      h4 Products
+
+      dl
+      each product in brand_products
+        dt
+          a(href=product.url) #{product.name}
+        dd #{product.detail}
+
+  p Do you really want to delete this Brand?
+
+    form(method='POST', action='')
+      div.form-group
+        input#brandId.form-control(type='hidden', name='brandId', required='true', value=brand._id)
+      
+      button.btn.btn-primary(type='submit') Delete

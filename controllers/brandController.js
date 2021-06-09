@@ -5,6 +5,7 @@ var Product = require('../models/product');
 
 const async = require('async');
 const { body, validationResult } = require("express-validator");
+const ProductInstance = require('../models/productInstance');
 
 // Display list of all brands
 exports.brand_list = function(req, res) {
@@ -61,6 +62,7 @@ exports.brand_create_get = function(req, res) {
   res.render('brand_form', renderObj);
 };
 
+// Handle Brand create on POST
 exports.brand_create_post = [
 
   // Validate and sanitiaze the name field
@@ -110,14 +112,131 @@ exports.brand_create_post = [
 ];
 
 // Display Brand delete form on GET
-exports.brand_delete_get = function(req, res) {
-  res.send('NOT Implemented: Brand Delete GET');
+exports.brand_delete_get = function(req, res, next) {
+
+  // When we remove the brand, we have to also delete products related to the
+  // brand.
+  async.parallel({
+    brand: function(callback) {
+      Brand.findById(req.params.id).exec(callback);
+    },
+
+    brand_products: function(callback) {
+      Product.find({ 'brand': req.params.id }).exec(callback);
+    },
+
+  }, function(err, results) {
+    if (err) { return next(err); }
+
+    // No results.
+    if (results.brand==null) {
+      res.redirect('/catalog/brands');
+    }
+
+    const renderObj = {
+      title: 'Delete Brand',
+      brand: results.brand,
+      brand_products: results.brand_products,
+    }
+
+    res.render('brand_delete', renderObj);
+  });
 };
 
-// Handle Brand delete on POST
-exports.brand_delete_post = function(req, res) {
-  res.send('NOT Implemented: Brand delete POST');
+// Display Brand delete form on GET
+exports.brand_cascade_delete_get = function(req, res, next) {
+
+  // When we remove the brand, we have to also delete products related to the
+  // brand.
+  async.parallel({
+    brand: function(callback) {
+      Brand.findById(req.params.id).exec(callback);
+    },
+
+    brand_products: function(callback) {
+      Product.find({ 'brand': req.params.id }).exec(callback);
+    },
+
+  }, function(err, results) {
+    if (err) { return next(err); }
+
+    // No results.
+    if (results.brand==null) {
+      res.redirect('/catalog/brands');
+    }
+
+    const renderObj = {
+      title: 'Delete Brand',
+      brand: results.brand,
+      brand_products: results.brand_products,
+    }
+
+    res.render('brand_cascade_delete', renderObj);
+  });
 };
+
+// Handle Brand delete on POST (Deletes only the brand but leaves any
+// of the brand's products intact)
+exports.brand_delete_post = function(req, res) {
+
+  Brand.findById(req.body.brandId)
+    .exec(function(err, results) {
+      if (err) { return next(err); }
+
+      // Success, delete brand but leave the children products.
+      Brand.findByIdAndRemove(req.body.brandId, function deleteBrand(err) {
+        if (err) { return next(err); }
+
+        // Success, redirect
+        res.redirect('/catalog/brands');
+      });
+    });
+  
+  
+};
+
+exports.brand_cascade_delete_post = function (req, res) {
+  
+  async.parallel({
+    brand: function(callback) {
+      Brand.findById(req.body.brandId).exec(callback);
+    },
+
+    brand_products: function(callback) {
+      Product.find({ 'brand': req.body.brandId }).exec(callback);
+    }
+
+  }, function(err, results) {
+    if (err) { return next(err); }
+
+    // Success
+
+    // First, remove ProductInstances and Products of the brand
+    console.log(results.brand_products);
+
+    // Removing productInstances of each product of the brand
+    results.brand_products.forEach(function (product) {
+      ProductInstance.deleteMany({ 'product': product._id }, function (err, results) {
+        if (err) { return next(err); }
+
+        console.log("ProductInstances Removed: " + results);
+
+        // After removing instances of a product, remove the product itself
+        Product.findByIdAndRemove(product._id, function(err) {
+          if (err) { return next(err); }
+        });
+      });
+    });
+
+    // Finally, delete the brand
+    Brand.findByIdAndRemove(req.body.brandId, function deleteBrand(err) {
+      if (err) { return next(err); }
+
+      // Success, redirect
+      res.redirect('/catalog/brands');
+    });
+  });
+}
 
 // Display Brand update form on GET
 exports.brand_update_get = function(req, res) {

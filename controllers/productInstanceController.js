@@ -1,6 +1,10 @@
 // TODO
 
+var Product = require('../models/product');
 var ProductInstance = require('../models/productInstance');
+
+const { body, validationResult } = require('express-validator');
+const async = require('async');
 
 // Display list of all ProductInstances.
 exports.productInstance_list = function(req, res) {
@@ -9,7 +13,12 @@ exports.productInstance_list = function(req, res) {
     .exec(function (err, list_productInstances) {
       if (err) { return next(err); }
       // Successful, so render
-      res.render('productInstance_list', { title: 'Product Instance List', productInstance_list: list_productInstances });
+      const renderObj = { 
+        title: 'Product Instance List',
+        productInstance_list: list_productInstances,
+      };
+
+      res.render('productInstance_list', renderObj);
     });
 };
 
@@ -37,13 +46,71 @@ exports.productInstance_detail = function(req, res) {
 
 // Display ProductInstance Create form on GET
 exports.productInstance_create_get = function(req, res) {
-  res.send('NOT Implemented: ProductInstance Create GET');
+  Product.find({}, 'name')
+    .exec(function (err, products) {
+      if (err) { return next(err); }
+      // Successful, So render.
+      const renderObj = {
+        title: 'Create Product Instance',
+        product_list: products,
+      };
+
+      res.render('productInstance_form', renderObj);
+    });
 };
 
 // Handle ProductInstance Create on POST
-exports.productInstance_create_post = function(req, res) {
-  res.send('NOT Implemented: ProductInstance Create POST');
-};
+exports.productInstance_create_post = [
+
+  // Validate and sanitize fields
+  body('product', 'Product must be specified').trim().isLength({ min: 1 }).escape(),
+
+  // Process the request after validation and sanitization.
+  (req, res, next) => {
+    
+    // Extract the validation errors from a request.
+    const errors = validationResult(req);
+
+    // Create a ProductInstance object with escaped and trimmed data
+    var productInstance = new ProductInstance(
+      {
+        product: req.body.product,
+      });
+
+    if (!errors.isEmpty()) {
+      // There are errors. Render the form again with sanitized values and error messages.
+      Product.find({}, 'name')
+        .exec(function (err, products) {
+          if (err) { return next(err); }
+          // Successful, so render.
+          const renderObj = {
+            title: 'Create Product Instance',
+            product_list: products,
+            selected_product: productInstance.product._id,
+            errors: errors.array(),
+            productInstance: productInstance,
+          }
+          res.render('productInstance_form', renderObj);
+        });
+
+        return;
+    } else {
+      // Data from form is valid.
+      productInstance.save(function(err) {
+        if (err) { return next(err); }
+        Product.findByIdAndUpdate(productInstance.product, { status: 'Available' }, function(err, results) {
+
+          if (err) { return next(err); }
+          // Successful, redirect to Product's page          
+          res.redirect(results.url);
+        });
+      });
+
+      
+    }
+
+  }
+];
 
 // Display ProductInstance Delete form on GET
 exports.productInstance_delete_get = function(req, res) {

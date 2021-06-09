@@ -114,8 +114,8 @@ router.get('/productInstance/:id/update', productInstance_controller.productInst
 // POST request for updating a ProductInstance
 router.post('/productInstnace/:id/update', productInstance_controller.productInstance_update_post);
 
-// GET request for ONE ProductInstance
-router.get('/productInstance/:id', productInstance_controller.productInstance_detail);
+// // GET request for ONE ProductInstance (NOTE: this redirects to the respected product's page)
+// router.get('/productInstance/:id', productInstance_controller.productInstance_detail);
 
 // POST request for list of all ProductInstances
 router.get('/productInstances', productInstance_controller.productInstance_list);

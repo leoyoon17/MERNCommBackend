@@ -10,6 +10,13 @@ const ProductInstanceSchema = new mongoose.Schema({
   
 });
 
+// Virtual for ProductInstanc's URL
+ProductInstanceSchema
+  .virtual('url')
+  .get(function () {
+    return 'catalog/productInstance' + this._id;
+  });
+  
 const ProductInstance = mongoose.model('ProductInstance', ProductInstanceSchema);
 
 module.exports = ProductInstance;

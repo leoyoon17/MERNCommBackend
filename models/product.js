@@ -18,7 +18,7 @@ const ProductSchema = new mongoose.Schema({
 
   description:  { type: String,
                   required: true,
-                  maxLength: 500
+                  maxLength: 3000
                 },
 
   status: {
@@ -38,7 +38,7 @@ const ProductSchema = new mongoose.Schema({
 ProductSchema
   .virtual('url')
   .get(function () {
-    return '/catalog/book/' + this._id;
+    return '/catalog/product/' + this._id;
   });
 
 const Product = mongoose.model("Product", ProductSchema);

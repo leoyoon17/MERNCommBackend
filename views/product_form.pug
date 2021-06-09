@@ -1,0 +1,41 @@
+extends layout
+
+block content
+
+  h1 #{title}
+
+  form(method='POST' action='')
+    div.form-group
+      label(for='name') Name:
+      input#name.form-control(type='text', placeholder='Name of Product' name='name' required='true' value=(undefined===product ? '' : product.name))
+    div.form-group
+      label(for='brand') Brand:
+      select#brand.form-control(type='select', placeholder='Select Brand', name='brand', required='true')
+        - brands.sort(function(a, b) {let textA = a.name.toUpperCase(); let textB = b.name.toUpperCase(); return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;});
+        for brand in brands
+          if product
+            option(value=brand._id selected=(brand._id.toString()===product.brand._id.toString() ? 'selected' : false) ) #{brand.name}
+          else
+            option(value=brand._id) #{brand.name}
+
+    div.form-group
+      label(for='description') Description:
+      textarea#description.form-control(type='textarea', placeholder='Description', name='description', required='true') #{undefined===product ? '' : product.description}
+    div.form-group
+      label(for='price') Price:
+      input#price.form-control(type='number', min='0', name='price' step='any', placeholder='Price of product')
+    div.form-group
+      label Tag: 
+      div
+        for tag in tags
+          div(style='display: inline; padding-right:10px;')
+            input.checkbox-input(type='checkbox', name='tag', id=tag._id, value=tag._id, checked=tag.checked)
+            label(for=tag._id) #{tag.name}
+    button.btn.btn-primary(type='submit') Submit
+
+  if errors
+    ul
+      for error in errors
+        li!= error.msg
+
+

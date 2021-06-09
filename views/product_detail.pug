@@ -1,0 +1,15 @@
+extends layout
+
+block content
+  h1 Product: #{product.name}
+
+  p #[strong Brand:]
+    a(href=product.brand.url) #{product.brand.name}
+  p #[strong Description:] #{product.description}
+  p #[strong Stock:] #{product_count}
+  p #[strong Status:] #{product.status}
+  p #[strong Tags:]
+    each tag in product.tag
+      a(href=tag.url) #{tag.name}
+  
+  

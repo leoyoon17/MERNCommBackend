@@ -1,0 +1,12 @@
+extend layout
+
+block content
+  h1 Delete Tag: #{title}
+
+  p Are you sure you want to delete #{tag.name}?
+
+  form(method='POST', action='')
+    div.form-group
+      input#tagId.form-control(type='hidden', name='tagId', required='true', value=tag._id)
+
+    button.btn.btn-primary(type='submit') Delete

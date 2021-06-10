@@ -1,0 +1,12 @@
+extends layout
+
+block content
+  h1 Delete Product: #{product.name}
+
+  p Are you sure you want to delete an instance of #{product.name}?
+
+  form(method='POST', action='')
+    div.form-group
+      input#productInstanceId.form-control(type='hidden', name='productInstanceId', required='true', value=productInstance._id)
+
+    button.btn.btn-primary(type='submit') Delete  

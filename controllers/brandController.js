@@ -143,7 +143,7 @@ exports.brand_delete_get = function(req, res, next) {
   });
 };
 
-// Display Brand delete form on GET
+// Display Brand CASCADE delete form on GET
 exports.brand_cascade_delete_get = function(req, res, next) {
 
   // When we remove the brand, we have to also delete products related to the

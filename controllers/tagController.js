@@ -110,13 +110,26 @@ exports.tag_create_post = [
 ];
 
 // Display Tag Delete form on GET
-exports.tag_delete_get = function(req, res) {
-  res.send('NOT Implemented: Tag Delete GET');
+exports.tag_delete_get = function(req, res, next) {
+  Tag.findById(req.params.id).exec(function(err, result) {
+    if (err) { return next(err); }
+
+    const renderObj = {
+      title: 'Delete Tag',
+      tag: result
+    };
+
+    res.render('tag_delete', renderObj);
+  });
 };
 
 // Handle Tag Delete on POST
-exports.tag_delete_post = function(req, res) {
-  res.send('NOT Implemented: Tag Delete POST');
+exports.tag_delete_post = function(req, res, next) {
+  Tag.findByIdAndRemove(req.body.tagId).exec(function(err, result) {
+    if (err) { return next(err); }
+
+    res.redirect('/catalog/tags');
+  });
 };
 
 // Display Tag update form on GET

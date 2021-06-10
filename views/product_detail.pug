@@ -3,6 +3,9 @@ extends layout
 block content
   h1 Product: #{product.name}
 
+  a(href=product.url+'/delete', title='Delete this product and all its instances')
+    button.btn.btn-danger() Cascade Delete #{product.name}
+
   p #[strong Brand:]
     if product.brand != null
       a(href=product.brand.url) #{product.brand.name}

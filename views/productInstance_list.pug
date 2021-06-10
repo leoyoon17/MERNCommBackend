@@ -9,6 +9,8 @@ block content
     each productInstance in productInstance_list
       li
         a(href=productInstance.product.url) #{productInstance.product.name} 
+        a(href='/catalog/productInstance/' + productInstance._id + '/delete')
+          button.btn.btn-danger() Delete Instance
         //- if productInstance.product.status=='Available'
         //-   span.text-success #{productInstance.product.status}
         //- else if productInstance.status=='Out of Stock'

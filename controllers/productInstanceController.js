@@ -113,13 +113,35 @@ exports.productInstance_create_post = [
 ];
 
 // Display ProductInstance Delete form on GET
-exports.productInstance_delete_get = function(req, res) {
-  res.send('NOT Implemented: ProductInstance Delete GET');
+exports.productInstance_delete_get = function(req, res, next) {
+
+  ProductInstance.findById(req.params.id, function (err, result) {
+    if (err) { return next(err); }
+
+    Product.findById(result.product, function (err, productResult) {
+      if (err) { return next(err); }
+
+      const renderObj = {
+        title: 'Delete Product Instance',
+        productInstance: result,
+        product: productResult,
+      };
+  
+      res.render('productInstance_delete', renderObj);
+    });
+
+    
+  });
 };
 
 // Handle ProductInstance Delete on Post
 exports.productInstance_delete_post = function(req, res) {
-  res.send('NOT Implemented: ProductInstance Delete POST');
+
+  ProductInstance.findByIdAndRemove(req.body.productInstanceId, function(err, result) {
+    if (err) { return next(err); }
+
+    res.redirect('/catalog/product/' + result.product);
+  });
 };
 
 // Display ProductInstance Update form on GET

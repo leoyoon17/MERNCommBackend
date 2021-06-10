@@ -4,9 +4,11 @@ block content
   h1= title
 
   ul
-    each val in tag_list
+    each tag in tag_list
       li
-        a(href=val.url) #{val.name}
+        a(href=tag.url) #{tag.name}
+        a(href='/catalog/tag/' + tag._id + '/delete')
+          button.btn.btn-danger() Delete Tag
     
     else
       li There are no tags.

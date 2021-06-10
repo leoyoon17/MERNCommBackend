@@ -1,0 +1,27 @@
+extend layout
+
+block content
+  h1 #{title}: #{product.name}
+
+  if productInstances.length
+
+    p #[strong the following Product Instances will be deleted with this Product.]
+
+    div(style='margin-left:20px; margin-top:20px')
+
+      h4 ProductInstances
+
+      dl
+      each productInstance in productInstances
+        dt
+          a(href=product.url) #{product.name}
+        dd #{product.detail}
+
+  p Do you really want to delete this Product?
+
+    form(method='POST', action='')
+      div.form-group
+        input#productId.form-control(type='hidden', name='productId', required='true', value=product._id)
+
+      button.btn.btn-primary(type='submit') Delete
+        

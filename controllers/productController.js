@@ -190,12 +190,61 @@ exports.product_create_post = [
 
 // Display Product Delete form on GET
 exports.product_delete_get = function(req, res) {
-  res.send('NOT Implemented: Product Delete GET');
+
+  // When we remove the product, we ahve to also delete its ProductInstances
+  async.parallel({
+    product: function(callback) {
+      Product.findById(req.params.id).exec(callback);
+    },
+
+    productInstances: function(callback) {
+      ProductInstance.find({ 'product': req.params.id }).exec(callback);
+    },
+  }, function(err, results) {
+    if (err) { return next(err); }
+
+    // No results.
+    if (results.product==null) {
+      res.redirect('/catalog/products');
+    }
+
+    const renderObj = {
+      title: 'Delete Product',
+      product: results.product,
+      productInstances: results.productInstances,
+    };
+
+    res.render('product_delete', renderObj);
+  });
 };
 
 // Handle Product Delete on POST
-exports.product_delete_post = function(req, res) {
-  res.send('NOT Implemented: Product Delete POST');
+exports.product_delete_post = function(req, res, next) {
+
+  async.parallel({
+    product: function(callback) {
+      Product.findById(req.body.productId).exec(callback);
+    },
+
+    productInstances: function(callback) {
+      ProductInstance.find({ 'product': req.body.productId }).exec(callback);
+    },
+  }, function(err, results) {
+    if (err) { return next(err); }
+
+    // First remove ProductInstances of the Product
+    ProductInstance.deleteMany({ 'product': req.body.productId}, function (err, results) {
+      if (err) { return next(err); }
+
+      // After removing instances of a product, remove the product itself
+      Product.findByIdAndRemove(req.body.productId, function(err) {
+        if (err) { return next(err); }
+
+        // Success, redirect
+        res.redirect('/catalog/products');
+      });
+    });
+  });
 };
 
 // Display Product Update form on GET

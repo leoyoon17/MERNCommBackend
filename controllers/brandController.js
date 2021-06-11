@@ -195,6 +195,8 @@ exports.brand_delete_post = function(req, res) {
   
 };
 
+// Handle Brand CASCADE delete on post (Deletes the brand and any related
+// product and its instances.)
 exports.brand_cascade_delete_post = function (req, res) {
   
   async.parallel({
@@ -239,12 +241,66 @@ exports.brand_cascade_delete_post = function (req, res) {
 }
 
 // Display Brand update form on GET
-exports.brand_update_get = function(req, res) {
-  res.send('NOT Implemented: Brand update GET');
+exports.brand_update_get = function(req, res, next) {
+
+  // Retrieve Brand
+  Brand.findById(req.params.id, function (err, result) {
+    if (err) { return next(err); }
+
+    // No result
+    if (result==null) {
+      var err = new Error('Brand not found');
+      err.status = 404;
+      return next(err);
+    }
+
+    // Success
+    const renderObj = {
+      title: 'Update Brand',
+      brand: result,
+    };
+
+    res.render('brand_form', renderObj);
+  });
+
 };
 
 // Handle Brand update on POST
-exports.brand_update_post = function(req, res) {
-  res.send('NOT Implemented: Brand update POST');
-};
+exports.brand_update_post = [
+  
+  body('name', 'Name must not be empty').trim().isLength({ min: 1}).escape(),
 
+  // Process request after validation and sanitization.
+  (req, res, next) => {
+
+    // Extract the validation errors from the request
+    const errors = validationResult(req);
+
+    // Create a Brand object with escaped/trimmed data and OLD id
+    var brand = new Brand({
+      name: req.body.name,
+      _id: req.params.id // This is required, or a new ID will be assigned
+    });
+
+    if (!errors.isEmpty()) {
+      // There are some errors. Render form again with sanitized values/error messages
+
+      const renderObj = {
+        title: 'Update Product',
+        brand: brand,
+        errors: errors.array(),
+      };
+
+      res.render('brand_form', renderObj);
+    } else {
+      // Data from form is valid. Update the record
+      Brand.findByIdAndUpdate(req.params.id, brand, {}, function(err, myBrand) {
+        if (err) { return next(err); }
+
+        // Successful - redirect to product detail page
+
+        res.redirect(myBrand.url);
+      });
+    }
+  }
+];

@@ -134,10 +134,62 @@ exports.tag_delete_post = function(req, res, next) {
 
 // Display Tag update form on GET
 exports.tag_update_get = function(req, res) {
-  res.send('NOT Implenented: Tag Update Get');
+  
+  Tag.findById(req.params.id, function(err, result) {
+    if (err) { return next(err); }
+
+    // No result
+    if (result==null) {
+      var err = new Error('Tag not found');
+      err.status = 400;
+      return next(err);
+    }
+
+    // Success
+    const renderObj = {
+      title: 'Update Tag',
+      tag: result,
+    };
+
+    res.render('tag_form', renderObj);
+  });
 };
 
 // Handle Tag update on POST
-exports.tag_update_post = function(req, res) {
-  res.send('NOT Implemented: Tag Update Post');
-};
+exports.tag_update_post = [
+
+  body('name', 'Name must not be empty').trim().isLength({ min: 1}).escape(),
+
+  // Process request after validation and sanitization
+  (req, res, next) => {
+
+    // Extract the validation errors from the request
+    const errors = validationResult(req);
+
+    // Create a new Tag object with escaped/trimmed data and OLD id
+    var tag = new Tag({
+      name: req.body.name,
+      _id: req.params.id // This is required, or a new ID will be assigned
+    });
+
+    if(!errors.isEmpty()) {
+      // There are some errors. Render the form again with sanitaized values/error messages
+
+      const renderObj = {
+        title: 'Update Tag',
+        tag: tag,
+        errors: errors.array(),
+      };
+
+      res.render('tag_form', renderObj);
+    } else {
+      // Data from form is valid. Update the record
+      Tag.findByIdAndUpdate(req.params.id, tag, {}, function(err, myTag) {
+        if (err) { return next(err); }
+
+        // Succesfful - redirect to product detail page
+        res.redirect(myTag.url);
+      });
+    }
+  }
+];

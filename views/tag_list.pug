@@ -7,8 +7,10 @@ block content
     each tag in tag_list
       li
         a(href=tag.url) #{tag.name}
+        a(href='/catalog/tag/' + tag._id + '/update')
+          button.btn.btn-primary() Update
         a(href='/catalog/tag/' + tag._id + '/delete')
-          button.btn.btn-danger() Delete Tag
+          button.btn.btn-danger() Delete
     
     else
       li There are no tags.

@@ -5,11 +5,13 @@ block content
   h1 Brand: #{brand.name}
 
   hr
+  
+  a(href=brand.url+'/update')
+    button.btn.btn-primary() Update
   a(href=brand.url+'/delete')
-    |
-    button.btn.btn-warning() Delete #{brand.name}
+    button.btn.btn-warning() Delete
   a(href=brand.url+'/cascadeDelete', title='Delete this brand and all its products')
-    button.btn.btn-danger() Cascade Delete #{brand.name}
+    button.btn.btn-danger() Cascade Delete
 
   div(style='margin-left:20px;margin-top:20px')
 

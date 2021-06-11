@@ -23,7 +23,7 @@ block content
       textarea#description.form-control(type='textarea', placeholder='Description', name='description', required='true') #{undefined===product ? '' : product.description}
     div.form-group
       label(for='price') Price:
-      input#price.form-control(type='number', min='0', name='price' step='any', placeholder='Price of product')
+      input#price.form-control(type='number', min='0', name='price' step='any', placeholder='Price of product', required='true' value=(undefined===product ? '' : product.price))
     div.form-group
       label Tag: 
       div

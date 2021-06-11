@@ -3,8 +3,10 @@ extends layout
 block content
   h1 Product: #{product.name}
 
+  a(href=product.url+'/update')
+    button.btn.btn-primary() Update
   a(href=product.url+'/delete', title='Delete this product and all its instances')
-    button.btn.btn-danger() Cascade Delete #{product.name}
+    button.btn.btn-danger() Cascade Delete
 
   p #[strong Brand:]
     if product.brand != null

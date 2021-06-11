@@ -249,10 +249,132 @@ exports.product_delete_post = function(req, res, next) {
 
 // Display Product Update form on GET
 exports.product_update_get = function(req, res) {
-  res.send('NOT Implemented: Product Update GET');
+  
+  // Retrieve book, brands and tags for form
+  async.parallel({
+    product: function(callback) {
+      Product.findById(req.params.id)
+        .populate('brand')
+        .populate('tag')
+        .exec(callback);
+    },
+
+    brands: function(callback) {
+      Brand.find(callback);
+    },
+
+    tags: function(callback) {
+      Tag.find(callback);
+    }
+  }, function(err, results) {
+    if (err) { return next(err); }
+
+    // No results
+    if (results.product==null) {
+      var err = new Error('Product not found');
+      err.status = 404;
+      return next(err);
+    }
+
+    // Success.
+    // Mark our selected tags a checked
+    for (var allTagsIter = 0; allTagsIter < results.tags.length; allTagsIter++) {
+      for (var prodTagsIter = 0; prodTagsIter < results.product.tag.length; prodTagsIter++) {
+        if (results.tags[allTagsIter]._id.toString()===results.product.tag[prodTagsIter]._id.toString()) {
+          results.tags[allTagsIter].checked = 'true';
+        }
+      }  
+    }
+
+    const renderObj = {
+      title: 'Update Product',
+      brands: results.brands,
+      tags: results.tags,
+      product: results.product,
+    };
+
+    res.render('product_form', renderObj);
+  });
 };
 
 // Handle Product Update on POST
-exports.product_update_post = function(req, res) {
-  res.send('NOT Implemented: Product Update POST');
-};
+exports.product_update_post = [
+  // Convert the tags into an array
+  (req, res, next) => {
+    if (!(req.body.tag instanceof Array)) {
+      if(typeof req.body.tag==='undefined') {
+        req.body.tag=[];
+      } else {
+        req.body.tag = new Array(req.body.tag);
+      }
+    }
+    next();
+  },
+
+  // Validate an sanitize fields
+  body('name', 'Name must not be empty').trim().isLength({ min: 1}).escape(),
+  body('brand', 'Brand must not be empty').trim().isLength({ min: 1}).escape(),
+  body('price', 'Price must not be empty').trim().isLength({ min: 1}).escape(),
+  body('description', 'Description must not be empty').trim().isLength({ min: 1}).escape(),
+  body('tag.*').escape(),
+
+  // Process request after validation and sanitization.
+  (req, res, next) => {
+
+    // Extract the validation errors from a request
+    const errors = validationResult(req);
+
+    // Create a Product object with escaped/trimmed data and OLD id.
+    var product = new Product({
+      name: req.body.name,
+      brand: req.body.brand,
+      description: req.body.description,
+      price: req.body.price,
+      tag: (typeof req.body.tag==='undefined') ? [] : req.body.tag,
+      _id: req.params.id // This is required, or a new ID will be assigned!
+    });
+
+    if (!errors.isEmpty()) {
+      // There are some errors. Render form again with sanitized values/error messages.
+
+      // Get all brands and tags for form
+      async.parallel({
+        brands: function(callback) {
+          Brand.find(callback);
+        },
+
+        tags: function(callback) {
+          Tag.find(callback);
+        },
+      }, function(err, results) {
+        if (err) { return next(err); }
+
+        // Mark our selected tags as checked
+        for (let i = 0; i < results.tags.length; i++) {
+          if (product.tag.indexOf(results.tags[i]._id) > -1) {
+            results.tags[i].checked = 'true';
+          }
+        }
+
+        const renderObj = {
+          title: 'Update Product',
+          brands: results.brands,
+          tags: results.tags,
+          product: product,
+          errors: errors.array(),
+        };
+
+        res.render('product_form', renderObj);
+      });
+      return;
+    } else {
+      // Data from form is valid. Update the record.
+      Product.findByIdAndUpdate(req.params.id, product, {}, function(err, myProduct) {
+        if (err) { return next(err); }
+        
+        // Successful - redirect to product detail page
+        res.redirect(myProduct.url);
+      });
+    }
+  }
+];

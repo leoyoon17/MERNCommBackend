@@ -43,7 +43,13 @@ exports.product_list = function(req, res) {
     .exec(function (err, list_products) {
       if (err) { return next(err); }
       // Successful, so render
-      res.render('product_list', { title: 'Product List', product_list: list_products });
+      // console.log(list_products);
+      res.json({ 'list_products': list_products });
+
+      // Run this commented code for server side rendering but you have to comment out res.json(list_products) above.
+      // res.render('product_list', { title: 'Product List', product_list: list_products });
+      
+      
     });
 };
 

@@ -7,6 +7,10 @@ var productInstance_controller = require('../controllers/productInstanceControll
 var brand_controller = require('../controllers/brandController');
 var tag_controller = require('../controllers/tagController');
 
+router.get('/test', function(req, res) {
+  res.json({ message: "Hello World"});
+});
+
 // PRODUCT ROUTES //
 
 // GET catalog home page
